@@ -1,6 +1,4 @@
-<?php
-    echo "<h1>My First PHP Script</h1>";
-?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -9,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Football Manager</title>
     <link rel="stylesheet" href="../assets/css/form.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 
 
@@ -16,18 +15,18 @@
     
 <div class="form-container" >
 <h2>Player Form</h2>
-<form id="paginatedForm">
+<form id="paginatedForm" method="POST">
  
 
     <!-- Section 1 -->
     <div class="form-section hidden">
         <div class="form-group">
             <label for="name">Name</label>
-            <input type="text"  id="name" placeholder="Enter player's name">
+            <input type="text"  id="name" name="name" placeholder="Enter player's name">
         </div>
         <div class="form-group">
             <label for="photo">Photo</label>
-            <input type="url" id="photo" placeholder="Enter photo URL" >
+            <input type="url" id="photo" name="photo" placeholder="Enter photo URL" >
         </div>
         <div class="form-group">
             <label for="nationality">Nationality</label>
@@ -136,12 +135,21 @@
     
 
     <div class="buttons">
+
         <button class="btn" type="button" id="prevBtn">Previous</button>
         <button class="btn" type="button" id="nextBtn">Next</button>
+         <input type="submit" id="submit" class="btn hidden" value="Submit">
         <button class="btn hidden" type="button" id="savechange">save changes</button>
     </div>
 </form>
 </div>
+
+
+
+Welcome <?php echo $_POST["name"]; ?><br>
+
+Your email address is: <?php echo $_POST["photo"]; ?>
+
 
 
 <script src="../assets/js/validation.js"></script>

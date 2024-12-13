@@ -4,6 +4,7 @@ const nextBtn = document.getElementById("nextBtn");
 const playerType = document.getElementById("playerType");
 const playerFields = document.getElementById("playerFields");
 const goalkeeperFields = document.getElementById("goalkeeperFields");
+const submit = document.getElementById("submit");
 let currentSection = 0;
 
 function updateForm() {
@@ -25,6 +26,7 @@ function updateForm() {
         document.getElementById("handling").value = '10';
         document.getElementById("reflexes").value = '10';
         nextBtn.textContent = "Submit" 
+        submit.classList.remove("hidden");
       } else if (playerType.value === "goalkeeper") {
         goalkeeperFields.classList.remove("hidden");
         playerFields.classList.add("hidden");
@@ -127,8 +129,8 @@ function updateForm() {
         currentSection++;
         updateForm();
       } else {
-        saveData();
         currentSection = 0;
+
         updateForm();
         document.getElementById("paginatedForm").reset();
         alert("secuse");

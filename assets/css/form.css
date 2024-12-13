@@ -1,5 +1,5 @@
 .form-container {
-    background-color: #9d949466;
+    background-color: var(--primary-color);
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
@@ -48,7 +48,7 @@
     background-color: #0056b3;
   }
   .btn:disabled {
-    background-color: #ccc;
+    background-color: #eba10c;
     cursor: not-allowed;
   }
   
