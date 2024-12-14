@@ -7,9 +7,9 @@ const goalkeeperFields = document.getElementById("goalkeeperFields");
 const submit = document.getElementById("submit");
 let currentSection = 0;
 
+
 function updateForm() {
-  
-    sections.forEach((section, index) => {
+      sections.forEach((section, index) => {
       if (index === currentSection) {
         section.classList.remove("hidden");
       }else {

@@ -6,8 +6,9 @@
   font-family: "Rubik", sans-serif;
 }
 body {
-  background-color: white;
-  width: 100%;
+ 
+  background-color: rgb(167, 53, 53);
+  display: flex;
 }
 
 :root {
