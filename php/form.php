@@ -1,5 +1,6 @@
 <?php
 // Initialisation des variables et des erreurs
+include "confige.php" ;
 $errors = [];
 $data = [];
 
@@ -14,6 +15,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $data['rating'] = !empty($_POST['rating']) ? (int)$_POST['rating'] : null;
     $data['playerType'] = !empty($_POST['playerType']) ? $_POST['playerType'] : null;
 
+    
     // Champs spécifiques au joueur ou au gardien
     if ($data['playerType'] === 'player') {
         $data['playerPosition'] = !empty($_POST['playerPosition']) ? $_POST['playerPosition'] : null;
@@ -49,14 +51,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
-    // Si aucune erreur, afficher les données et réinitialiser
     if (empty($errors)) {
         echo '<h2>Form Data:</h2>';
         echo '<pre>' . print_r($data, true) . '</pre>';
-
-        // Réinitialiser le formulaire
         $data = [];
+       
     }
+    
+    $sql = "INSERT INTO player (player_name, photo, rating)
+    VALUES ('$name', '$photo', '$rating');";
+    $result = $conn->query($sql); 
+
+
+    if ($conn->multi_query($sql) === TRUE) {
+       echo "New records created successfully";
+     } else {
+       echo "Error: " . $sql . "<br>" . $conn->error;
+     }
+     
+     $conn->close();
+   
+  
 }
 ?>
 
@@ -136,7 +151,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
 
                 <!-- Section 3 (Goalkeeper-specific) -->
-                <?php if ($data['playerType'] === 'goalkeeper' || $_SERVER['REQUEST_METHOD'] === 'GET'): ?>
+
                 <div class="form-section" id="goalkeeperFields">
                     <div class="form-group">
                         <label for="diving">Diving</label>
@@ -154,10 +169,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <small style="color: red;"><?php echo $errors['reflexes'] ?? ''; ?></small>
                     </div>
                 </div>
-                <?php endif; ?>
+
 
                 <!-- Section 3 (Player-specific) -->
-                <?php if ($data['playerType'] === 'player' || $_SERVER['REQUEST_METHOD'] === 'GET'): ?>
+                
                 <div class="form-section" id="playerFields">
                     <div class="form-group">
                         <label for="playerPosition">Position</label>
@@ -202,7 +217,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <small style="color: red;"><?php echo $errors['physical'] ?? ''; ?></small>
                     </div>
                 </div>
-                <?php endif; ?>
+             
 
                 <div class="buttons">
                     <button class="btn" type="submit">Submit</button>
@@ -210,5 +225,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </form>
         </div>
     </div>
+    
+    <script>
+    const playerTypeSelect = document.getElementById('playerType');
+    const playerFields = document.getElementById('playerFields');
+    const goalkeeperFields = document.getElementById('goalkeeperFields');
+
+    function toggleFields() {
+        const selectedType = playerTypeSelect.value;
+        if (selectedType === 'player') {
+            playerFields.style.display = 'block';
+            goalkeeperFields.style.display = 'none';
+        } else if (selectedType === 'goalkeeper') {
+            playerFields.style.display = 'none';
+            goalkeeperFields.style.display = 'block';
+        } else {
+            playerFields.style.display = 'none';
+            goalkeeperFields.style.display = 'none';
+        }
+    }
+
+    playerTypeSelect.addEventListener('change', toggleFields);
+    window.onload = toggleFields; 
+</script>
+
+
 </body>
 </html>
