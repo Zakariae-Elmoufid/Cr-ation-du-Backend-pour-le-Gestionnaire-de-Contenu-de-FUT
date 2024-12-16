@@ -1,78 +1,82 @@
 <?php
-// Initialisation des variables et des erreurs
-include "confige.php" ;
-$errors = [];
-$data = [];
+include 'confige.php'; 
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Récupération et validation des données
-    $data['name'] = !empty($_POST['name']) ? htmlspecialchars(trim($_POST['name'])) : null;
-    $data['photo'] = !empty($_POST['photo']) ? htmlspecialchars(trim($_POST['photo'])) : null;
-    $data['nationality'] = !empty($_POST['nationality']) ? htmlspecialchars(trim($_POST['nationality'])) : null;
-    $data['flag'] = !empty($_POST['flag']) ? htmlspecialchars(trim($_POST['flag'])) : null;
-    $data['club'] = !empty($_POST['club']) ? htmlspecialchars(trim($_POST['club'])) : null;
-    $data['logo'] = !empty($_POST['logo']) ? htmlspecialchars(trim($_POST['logo'])) : null;
-    $data['rating'] = !empty($_POST['rating']) ? (int)$_POST['rating'] : null;
-    $data['playerType'] = !empty($_POST['playerType']) ? $_POST['playerType'] : null;
+if($_SERVER['REQUEST_METHOD'] === 'POST'){
+    $name = $_POST['name'] ?? null;
+    $photo = $_POST['photo'] ?? null;
+    $rating = $_POST['rating'] ?? null;
+    $nationality = $_POST['nationality'] ?? null;
+    $flag = $_POST['flag'] ?? null;
+    $club = $_POST['club'] ?? null;
+    $logo = $_POST['logo'] ?? null;
+    $playerType = $_POST['playerType'] ?? null;
 
-    
-    // Champs spécifiques au joueur ou au gardien
-    if ($data['playerType'] === 'player') {
-        $data['playerPosition'] = !empty($_POST['playerPosition']) ? $_POST['playerPosition'] : null;
-        $data['pace'] = !empty($_POST['pace']) ? (int)$_POST['pace'] : null;
-        $data['shooting'] = !empty($_POST['shooting']) ? (int)$_POST['shooting'] : null;
-        $data['dribbling'] = !empty($_POST['dribbling']) ? (int)$_POST['dribbling'] : null;
-        $data['defending'] = !empty($_POST['defending']) ? (int)$_POST['defending'] : null;
-        $data['physical'] = !empty($_POST['physical']) ? (int)$_POST['physical'] : null;
-    } elseif ($data['playerType'] === 'goalkeeper') {
-        $data['diving'] = !empty($_POST['diving']) ? (int)$_POST['diving'] : null;
-        $data['handling'] = !empty($_POST['handling']) ? (int)$_POST['handling'] : null;
-        $data['reflexes'] = !empty($_POST['reflexes']) ? (int)$_POST['reflexes'] : null;
-    }
+    $errors = [];
 
-    // Validation des champs obligatoires
-    foreach (['name', 'photo', 'nationality', 'flag', 'club', 'logo', 'rating', 'playerType'] as $field) {
-        if (empty($data[$field])) {
-            $errors[$field] = ucfirst($field) . " is required.";
-        }
-    }
-
-    if ($data['playerType'] === 'player') {
-        foreach (['playerPosition', 'pace', 'shooting', 'dribbling', 'defending', 'physical'] as $field) {
-            if (empty($data[$field])) {
-                $errors[$field] = ucfirst($field) . " is required for players.";
-            }
-        }
-    } elseif ($data['playerType'] === 'goalkeeper') {
-        foreach (['diving', 'handling', 'reflexes'] as $field) {
-            if (empty($data[$field])) {
-                $errors[$field] = ucfirst($field) . " is required for goalkeepers.";
-            }
-        }
-    }
+    // Validate fields
+    if (empty($name)) $errors['name'] = "Name is required.";
+    if (empty($photo)) $errors['photo'] = "Photo URL is required.";
+    if (empty($rating)) $errors['rating'] = "Rating is required.";
+    if (empty($nationality)) $errors['nationality'] = "Nationality is required.";
+    if (empty($club)) $errors['club'] = "Club is required.";
 
     if (empty($errors)) {
-        echo '<h2>Form Data:</h2>';
-        echo '<pre>' . print_r($data, true) . '</pre>';
-        $data = [];
-       
+        // Insert into player table
+        $stmt = $conn->prepare("INSERT INTO player (player_name, photo, rating, status_player) VALUES (?, ?, ?, ?)");
+        $stmt->bind_param("ssii", $name, $photo, $rating, $status_player);
+        $stmt->execute();
+        $stmt->close();
+        
+
+      // Insert into nationality table
+      $stmtNationality = $conn->prepare("INSERT INTO nationality (name_nationality, flag) VALUES (?, ?)");
+      $stmtNationality->bind_param("ss", $nationality, $flag);
+      $stmtNationality->execute();
+      $stmtNationality->close();
+
+        // Insert into club table
+        $stmtClub = $conn->prepare("INSERT INTO club (name_club, logo ) VALUES (?, ?)");
+        $stmtClub->bind_param("ss", $club, $logo );
+        $stmtClub->execute();
+        $stmtClub->close();
+
+         // Insert into player type-specific tables
+         if ($playerType === 'goalkeeper') {
+            $diving = $_POST['diving'] ?? null;
+            $handling = $_POST['handling'] ?? null;
+            $reflexes = $_POST['reflexes'] ?? null;
+
+            $stmtGK = $conn->prepare("INSERT INTO gk_position (diving, handling, reflexes, player_id) VALUES (?, ?, ?, ?)");
+            $stmtGK->bind_param("iiii", $diving, $handling, $reflexes, $player_id);
+            $stmtGK->execute();
+            if (isset($stmtGK)) $stmtGK->close();
+        } else if ($playerType === 'player') {
+            $position = $_POST['playerPosition'] ?? '';
+            $pace = $_POST['pace'] ?? null;
+            $shooting = $_POST['shooting'] ?? null;
+            $dribbling = $_POST['dribbling'] ?? null;
+            $defending = $_POST['defending'] ?? null;
+            $physical = $_POST['physical'] ?? null;
+
+            $stmtPlayer = $conn->prepare("INSERT INTO other_position (position_player, pace, shooting, dribbling, defending, physical, player_id) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            $stmtPlayer->bind_param("siiiiii", $position, $pace, $shooting, $dribbling, $defending, $physical, $player_id);
+            $stmtPlayer->execute();
+            if (isset($stmtPlayer)) $stmtPlayer->close();
+        }
+
+         
+
+        echo "Player added successfully!";
+        
     }
-    
-    $sql = "INSERT INTO player (player_name, photo, rating)
-    VALUES ('$name', '$photo', '$rating');";
-    $result = $conn->query($sql); 
 
 
-    if ($conn->multi_query($sql) === TRUE) {
-       echo "New records created successfully";
-     } else {
-       echo "Error: " . $sql . "<br>" . $conn->error;
-     }
-     
-     $conn->close();
-   
-  
+
+
 }
+
+
+
 ?>
 
 <!DOCTYPE html>
@@ -97,22 +101,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <div class="main">
         <div class="form-container">
             <h2>Player Form</h2>
-            <form id="paginatedForm" method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+            <form id="paginatedForm" action="form.php" method="POST" >
                 <!-- Section 1 -->
                 <div class="form-section">
                     <div class="form-group">
                         <label for="name">Name</label>
-                        <input type="text" id="name" name="name" placeholder="Enter player's name" value="<?php echo $data['name'] ?? ''; ?>">
+                        <input type="text" id="name" name="name" placeholder="Enter player's name" value="">
                         <small style="color: red;"><?php echo $errors['name'] ?? ''; ?></small>
                     </div>
                     <div class="form-group">
                         <label for="photo">Photo</label>
-                        <input type="url" id="photo" name="photo" placeholder="Enter photo URL" value="<?php echo $data['photo'] ?? ''; ?>">
+                        <input type="url" id="photo" name="photo" placeholder="Enter photo URL" value="">
                         <small style="color: red;"><?php echo $errors['photo'] ?? ''; ?></small>
                     </div>
-                    <div class="form-group">
+                     <div class="form-group">
                         <label for="nationality">Nationality</label>
-                        <input type="text" id="nationality" name="nationality" placeholder="Enter player's nationality" value="<?php echo $data['nationality'] ?? ''; ?>">
+                        <input type="text" id="nationality" name="nationality" placeholder="Enter player's nationality" value="">
                         <small style="color: red;"><?php echo $errors['nationality'] ?? ''; ?></small>
                     </div>
                     <div class="form-group">
@@ -126,25 +130,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="form-section">
                     <div class="form-group">
                         <label for="club">Club</label>
-                        <input type="text" id="club" name="club" placeholder="Enter club name" value="<?php echo $data['club'] ?? ''; ?>">
+                        <input type="text" id="club" name="club" placeholder="Enter club name" value="">
                         <small style="color: red;"><?php echo $errors['club'] ?? ''; ?></small>
                     </div>
                     <div class="form-group">
                         <label for="logo">Club Logo</label>
-                        <input type="url" id="logo" name="logo" placeholder="Enter logo URL" value="<?php echo $data['logo'] ?? ''; ?>">
+                        <input type="url" id="logo" name="logo" placeholder="Enter logo URL" value="">
                         <small style="color: red;"><?php echo $errors['logo'] ?? ''; ?></small>
-                    </div>
+                    </div> 
                     <div class="form-group">
                         <label for="rating">Rating</label>
-                        <input type="number" id="rating" name="rating" placeholder="Enter player's rating" value="<?php echo $data['rating'] ?? ''; ?>">
+                        <input type="number" id="rating" name="rating" placeholder="">
                         <small style="color: red;"><?php echo $errors['rating'] ?? ''; ?></small>
                     </div>
                     <div class="form-group">
                         <label for="playerType">Select Player Type:</label>
                         <select id="playerType" name="playerType">
                             <option value="">Select</option>
-                            <option value="player" <?php echo ($data['playerType'] === 'player') ? 'selected' : ''; ?>>Field Player</option>
-                            <option value="goalkeeper" <?php echo ($data['playerType'] === 'goalkeeper') ? 'selected' : ''; ?>>Goalkeeper</option>
+                            <option value="player">Field Player</option>
+                            <option value="goalkeeper" >Goalkeeper</option>
                         </select>
                         <small style="color: red;"><?php echo $errors['playerType'] ?? ''; ?></small>
                     </div>
@@ -178,42 +182,42 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <label for="playerPosition">Position</label>
                         <select id="playerPosition" name="playerPosition">
                             <option value="">Select</option>
-                            <option value="LB" <?php echo ($data['playerPosition'] === 'LB') ? 'selected' : ''; ?>>Left Back (LB)</option>
-                            <option value="CBL" <?php echo ($data['playerPosition'] === 'CBL') ? 'selected' : ''; ?>>Center Back Left (CBL)</option>
-                            <option value="CBR" <?php echo ($data['playerPosition'] === 'CBR') ? 'selected' : ''; ?>>Center Back Right (CBR)</option>
-                            <option value="RB" <?php echo ($data['playerPosition'] === 'RB') ? 'selected' : ''; ?>>Right Back (RB)</option>
-                            <option value="CDM" <?php echo ($data['playerPosition'] === 'CDM') ? 'selected' : ''; ?>>Defensive Midfielder (CDM)</option>
-                            <option value="CM" <?php echo ($data['playerPosition'] === 'CM') ? 'selected' : ''; ?>>Center Midfielder (CM)</option>
-                            <option value="CAM" <?php echo ($data['playerPosition'] === 'CAM') ? 'selected' : ''; ?>>Attacking Midfielder (CAM)</option>
-                            <option value="LW" <?php echo ($data['playerPosition'] === 'LW') ? 'selected' : ''; ?>>Left Winger (LW)</option>
-                            <option value="ST" <?php echo ($data['playerPosition'] === 'ST') ? 'selected' : ''; ?>>Center Forward (ST)</option>
-                            <option value="RW" <?php echo ($data['playerPosition'] === 'RW') ? 'selected' : ''; ?>>Right Winger (RW)</option>
+                            <option value="LB" >Left Back (LB)</option>
+                            <option value="CBL" >Center Back Left (CBL)</option>
+                            <option value="CBR" >Center Back Right (CBR)</option>
+                            <option value="RB" >Right Back (RB)</option>
+                            <option value="CDM" >Defensive Midfielder (CDM)</option>
+                            <option value="CM" >Center Midfielder (CM)</option>
+                            <option value="CAM" >Attacking Midfielder (CAM)</option>
+                            <option value="LW" >Left Winger (LW)</option>
+                            <option value="ST" >Center Forward (ST)</option>
+                            <option value="RW" >Right Winger (RW)</option>
                         </select>
                         <small style="color: red;"><?php echo $errors['playerPosition'] ?? ''; ?></small>
                     </div>
                     <div class="form-group">
                         <label for="pace">Pace</label>
-                        <input type="number" id="pace" name="pace" placeholder="Enter pace score" value="<?php echo $data['pace'] ?? ''; ?>">
+                        <input type="number" id="pace" name="pace" placeholder="Enter pace score" value="">
                         <small style="color: red;"><?php echo $errors['pace'] ?? ''; ?></small>
                     </div>
                     <div class="form-group">
                         <label for="shooting">Shooting</label>
-                        <input type="number" id="shooting" name="shooting" placeholder="Enter shooting score" value="<?php echo $data['shooting'] ?? ''; ?>">
+                        <input type="number" id="shooting" name="shooting" placeholder="Enter shooting score" value="">
                         <small style="color: red;"><?php echo $errors['shooting'] ?? ''; ?></small>
                     </div>
                     <div class="form-group">
                         <label for="dribbling">Dribbling</label>
-                        <input type="number" id="dribbling" name="dribbling" placeholder="Enter dribbling score" value="<?php echo $data['dribbling'] ?? ''; ?>">
+                        <input type="number" id="dribbling" name="dribbling" placeholder="Enter dribbling score" value="">
                         <small style="color: red;"><?php echo $errors['dribbling'] ?? ''; ?></small>
                     </div>
                     <div class="form-group">
                         <label for="defending">Defending</label>
-                        <input type="number" id="defending" name="defending" placeholder="Enter defending score" value="<?php echo $data['defending'] ?? ''; ?>">
+                        <input type="number" id="defending" name="defending" placeholder="Enter defending score" value="">
                         <small style="color: red;"><?php echo $errors['defending'] ?? ''; ?></small>
                     </div>
                     <div class="form-group">
                         <label for="physical">Physical</label>
-                        <input type="number" id="physical" name="physical" placeholder="Enter physical score" value="<?php echo $data['physical'] ?? ''; ?>">
+                        <input type="number" id="physical" name="physical" placeholder="Enter physical score" value="">
                         <small style="color: red;"><?php echo $errors['physical'] ?? ''; ?></small>
                     </div>
                 </div>
