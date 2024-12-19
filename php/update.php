@@ -180,16 +180,11 @@ if(isset($_GET['id'])) {
     <link rel="stylesheet" href="../assets/css/dashbord.css">
     <title>FUT Champions</title>
 </head>
-<body style="display:flex">
-    <div class="sidebar">
-        <h1>Players Management</h1>
-        <div class="sidebar-menu">
-            <button><a href="dashbord.php">Dashboard</a></button>
-            <button><a href="player.php">Players List</a></button>
-            <button><a href="form.php">Add Player</a></button>
-        </div>
-    </div>
-    <div class="main">
+<body >
+<?php include ('sidbar.php'); ?>
+
+<main class="ml-64 p-8">
+<div class="w-xl  mx-auto">
         <div class="form-container">
             <h2>Player Form</h2>
             <form id="paginatedForm" action="update.php?id=<?php echo $id;?>" method="POST" >
@@ -215,7 +210,7 @@ if(isset($_GET['id'])) {
                         <label for="nationality">Nationality</label>
                         <select id="nationality" name="nationality">
                             <option value="">nationality?</option>
-                            <?php   $query = "select * from `nationality`";
+                            <?php   $query = "select * from nationality";
                                 $result = mysqli_query($conn, $query);
 
                             if(!$result){
@@ -238,7 +233,7 @@ if(isset($_GET['id'])) {
                         <label for="club">Club</label>
                         <select   id="club" name="club">
                             <option value="">select club</option>
-                            <?php  $query = "select * from `club`";
+                            <?php  $query = "select * from club";
                             $result = mysqli_query($conn, $query);
                             if(!$result){
                                 die("query failed". mysqli_error($conn));
@@ -335,7 +330,10 @@ if(isset($_GET['id'])) {
                 </div>
             </form>
         </div>
-    </div>
+ </main>
+
+
+              
     
     <script>
     document.getElementById('playerType').addEventListener('change', function() {

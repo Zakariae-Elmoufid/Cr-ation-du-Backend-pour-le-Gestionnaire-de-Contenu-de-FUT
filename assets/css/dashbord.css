@@ -40,6 +40,7 @@
 .main-content {
     flex-grow: 1;
     padding: 20px;
+    grid-template-columns: minmax(300px? 500px);
 }
 
 .stats-container {
