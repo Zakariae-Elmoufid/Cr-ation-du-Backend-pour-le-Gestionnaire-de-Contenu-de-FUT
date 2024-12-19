@@ -23,10 +23,14 @@
     padding: 10px;
     margin-bottom: 10px;
     background-color: #34495e;
-    color: white;
+    
     border: none;
     cursor: pointer;
     transition: background-color 0.3s;
+}
+.sidebar-menu  a {
+    color: white;
+    text-decoration: none;
 }
 
 .sidebar-menu button:hover {

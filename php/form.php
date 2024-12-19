@@ -6,75 +6,162 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
     $photo = $_POST['photo'] ?? null;
     $rating = $_POST['rating'] ?? null;
     $nationality = $_POST['nationality'] ?? null;
-    $flag = $_POST['flag'] ?? null;
     $club = $_POST['club'] ?? null;
-    $logo = $_POST['logo'] ?? null;
     $playerType = $_POST['playerType'] ?? null;
+    
+
 
     $errors = [];
+   // Pattern for text fields (letters and spaces only)
+   $patterText = "/^[a-zA-Z\s]+$/";
 
-    // Validate fields
-    if (empty($name)) $errors['name'] = "Name is required.";
-    if (empty($photo)) $errors['photo'] = "Photo URL is required.";
-    if (empty($rating)) $errors['rating'] = "Rating is required.";
-    if (empty($nationality)) $errors['nationality'] = "Nationality is required.";
-    if (empty($club)) $errors['club'] = "Club is required.";
+// Pattern for numeric fields (numbers between 10 and 100)
+$patterNumber = "/^(10|[1-9][0-9]|100)$/";
 
-    if (empty($errors)) {
-        // Insert into player table
-        $stmt = $conn->prepare("INSERT INTO player (player_name, photo, rating, status_player) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param("ssii", $name, $photo, $rating, $status_player);
-        $stmt->execute();
-        $stmt->close();
-        
+// Pattern for URLs
+$patterURL = "/^(https?:\/\/)?([\w\-]+)+([\w\-.\/?%&=]*)$/";
 
-      // Insert into nationality table
-      $stmtNationality = $conn->prepare("INSERT INTO nationality (name_nationality, flag) VALUES (?, ?)");
-      $stmtNationality->bind_param("ss", $nationality, $flag);
-      $stmtNationality->execute();
-      $stmtNationality->close();
+// Validate name
+if (isset($name)) {
+    if (!preg_match($patterText, $name)) {
+        $errors['name'] = "Invalid name format. Only letters and spaces are allowed.";
+    }
+}
 
-        // Insert into club table
-        $stmtClub = $conn->prepare("INSERT INTO club (name_club, logo ) VALUES (?, ?)");
-        $stmtClub->bind_param("ss", $club, $logo );
-        $stmtClub->execute();
-        $stmtClub->close();
+// Validate rating
+if (isset($rating)) {
+    if (!preg_match($patterNumber, $rating)) {
+        $errors['rating'] = "Rating must be between 10 and 100.";
+    }
+}
 
-         // Insert into player type-specific tables
-         if ($playerType === 'goalkeeper') {
-            $diving = $_POST['diving'] ?? null;
-            $handling = $_POST['handling'] ?? null;
-            $reflexes = $_POST['reflexes'] ?? null;
+// Validate photo
+if (isset($photo)) {
+    if (!preg_match($patterURL, $photo)) {
+        $errors['photo'] = "Invalid photo URL.";
+    }
+}
 
-            $stmtGK = $conn->prepare("INSERT INTO gk_position (diving, handling, reflexes, player_id) VALUES (?, ?, ?, ?)");
-            $stmtGK->bind_param("iiii", $diving, $handling, $reflexes, $player_id);
-            $stmtGK->execute();
-            if (isset($stmtGK)) $stmtGK->close();
-        } else if ($playerType === 'player') {
-            $position = $_POST['playerPosition'] ?? '';
-            $pace = $_POST['pace'] ?? null;
-            $shooting = $_POST['shooting'] ?? null;
-            $dribbling = $_POST['dribbling'] ?? null;
-            $defending = $_POST['defending'] ?? null;
-            $physical = $_POST['physical'] ?? null;
 
-            $stmtPlayer = $conn->prepare("INSERT INTO other_position (position_player, pace, shooting, dribbling, defending, physical, player_id) VALUES (?, ?, ?, ?, ?, ?, ?)");
-            $stmtPlayer->bind_param("siiiiii", $position, $pace, $shooting, $dribbling, $defending, $physical, $player_id);
-            $stmtPlayer->execute();
-            if (isset($stmtPlayer)) $stmtPlayer->close();
+
+
+
+
+if ($playerType === '0') {
+    $diving = $_POST['diving'] ?? null;
+    $handling = $_POST['handling'] ?? null;
+    $reflexes = $_POST['reflexes'] ?? null;
+
+
+    if (isset($diving)) {
+        if (!preg_match($patterNumber, $diving)) {
+            $errors['diving'] = "Diving must be between 10 and 100.";
         }
-
-         
-
-        echo "Player added successfully!";
-        
+    }
+    if (isset($handling)) {
+        if (!preg_match($patterNumber, $handling)) {
+            $errors['handling'] = "Handling must be between 10 and 100.";
+        }
+    }
+    if (isset($reflexes)) {
+        if (!preg_match($patterNumber, $reflexes)) {
+            $errors['reflexes'] = "Reflexes must be between 10 and 100.";
+        }
     }
 
 
+    
+    if(empty($diving)) $errors['diving'] = "Name is required.";
+    if(empty($handling)) $errors['handling'] = "handling is required.";
+    if(empty($reflexes)) $errors['reflexes'] = "reflexes is required."; 
+
+} elseif ($playerType === '1') {
+    $position = $_POST['playerPosition'] ?? null;
+    $pace = $_POST['pace'] ?? null;
+    $shooting = $_POST['shooting'] ?? null;
+    $defending = $_POST['defending'] ?? null;
+    $physical = $_POST['physical'] ?? null;
+
+    if (isset($pace)) {
+        if (!preg_match($patterNumber, $pace)) {
+            $errors['pace'] = "Pace must be between 10 and 100.";
+        }
+    }
+    if (isset($shooting)) {
+        if (!preg_match($patterNumber, $shooting)) {
+            $errors['shooting'] = "Shooting must be between 10 and 100.";
+        }
+    }
+
+    if (isset($defending)) {
+        if (!preg_match($patterNumber, $defending)) {
+            $errors['defending'] = "Defending must be between 10 and 100.";
+        }
+    }
+    if (isset($physical)) {
+        if (!preg_match($patterNumber, $physical)) {
+            $errors['physical'] = "Physical must be between 10 and 100.";
+        }
+    }
 
 
+    if(empty($pace)) $errors['pace'] = "pace is required";
+    if(empty($shooting)) $errors['shooting'] = "shooting is required" ;
+    if(empty($defending)) $errors['defending'] = "defending is required";
+    if(empty($physical)) $errors['physical'] = "physical is required";
+    
+   
+  
 }
+   
+   
 
+
+
+    if (empty($name)) $errors['name'] = "Name is required.";
+    if (empty($photo)) $errors['photo'] = "Photo URL is required.";
+    if (empty($rating)) $errors['rating'] = "Rating is required.";
+    if (empty($club)) $errors['club'] = "Club is required.";
+    // if (empty($playerType)) $errors["playerType"] = "Player Type is required";
+
+   
+
+    if (empty($errors)) {
+
+        $query  = mysqli_query(  $conn, "INSERT INTO player(player_name, photo, rating , status_player ,id_nationality, id_club) VALUES ('$name','$photo','$rating',' $playerType ', '$nationality', '$club');") ;
+
+        if($query){
+            $last_id = mysqli_insert_id($conn);
+
+            if ($playerType === '0') {
+                $queryGK  = mysqli_query($conn,"INSERT INTO gk_position  (diving, handling, reflexes, player_id) VALUES ('$diving', '$handling' ,'$reflexes','$last_id')");
+                if($queryGK){
+                    echo " $last_id";
+                    echo "gk added successfully!";
+                   
+                }else{
+                   echo "3ndk error";
+                }
+            
+         
+        } else if ($playerType === '1') {
+                $queryPlayer  = mysqli_query($conn,"INSERT INTO other_position  (position_player, pace, shooting, defending , physical , player_id)
+                 VALUES ('$position', '$pace' ,'$shooting', '$defending','$physical','$last_id');");
+                if($queryPlayer){
+                    echo " $last_id";
+                    echo "Player added successfully! ";
+                }else{
+                   echo "3ndk error";
+                }
+        }
+            
+        }else{
+           echo "3ndk error";
+        }
+
+    }
+    unset($_POST);
+}
 
 
 ?>
@@ -93,9 +180,9 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
     <div class="sidebar">
         <h1>Players Management</h1>
         <div class="sidebar-menu">
-            <button>Dashboard</button>
-            <button>Players List</button>
-            <button>Add Player</button>
+            <button><a href="dashbord.php">Dashboard</a></button>
+            <button><a href="player.php">Players List</a></button>
+            <button><a href="form.php">Add Player</a></button>
         </div>
     </div>
     <div class="main">
@@ -116,39 +203,58 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
                     </div>
                      <div class="form-group">
                         <label for="nationality">Nationality</label>
-                        <input type="text" id="nationality" name="nationality" placeholder="Enter player's nationality" value="">
+                        <!-- <input type="text" id="nationality" name="nationality" placeholder="Enter player's nationality" value=""> -->
+                        <select id="nationality" name="nationality">
+                            <option value="">nationality?</option>
+                            <?php   $query = "select *from `nationality`";
+                                $result = mysqli_query($conn, $query);
+
+                            if(!$result){
+                             die("query failed". mysqli_error($conn));
+                             }else {
+                               while($row = mysqli_fetch_assoc($result)){
+                                   ?>
+                                <option value="<?php echo $row['id']; ?>"  ><?php echo $row['name_nationality']; ?></option>
+                                   <?php
+                               }
+                            }
+                               ?>
+                        </select>
+                        
                         <small style="color: red;"><?php echo $errors['nationality'] ?? ''; ?></small>
                     </div>
                     <div class="form-group">
-                        <label for="flag">National Flag</label>
-                        <input type="url" id="flag" name="flag" placeholder="Enter flag URL" value="<?php echo $data['flag'] ?? ''; ?>">
-                        <small style="color: red;"><?php echo $errors['flag'] ?? ''; ?></small>
-                    </div>
-                </div>
-
-                <!-- Section 2 -->
-                <div class="form-section">
-                    <div class="form-group">
-                        <label for="club">Club</label>
-                        <input type="text" id="club" name="club" placeholder="Enter club name" value="">
-                        <small style="color: red;"><?php echo $errors['club'] ?? ''; ?></small>
-                    </div>
-                    <div class="form-group">
-                        <label for="logo">Club Logo</label>
-                        <input type="url" id="logo" name="logo" placeholder="Enter logo URL" value="">
-                        <small style="color: red;"><?php echo $errors['logo'] ?? ''; ?></small>
-                    </div> 
-                    <div class="form-group">
                         <label for="rating">Rating</label>
-                        <input type="number" id="rating" name="rating" placeholder="">
+                        <input type="number" id="rating" name="rating" placeholder="rating">
                         <small style="color: red;"><?php echo $errors['rating'] ?? ''; ?></small>
                     </div>
+                    
+                    <div class="form-group">
+                        <label for="club">Club</label>
+                        <select   id="club" name="club">
+                            <option value="">select club</option>
+                            <?php  $query = "select * from `club`";
+                            $result = mysqli_query($conn, $query);
+                            if(!$result){
+                                die("query failed". mysqli_error($conn));
+                                }else {
+                                  while($row = mysqli_fetch_assoc($result)){
+                                      ?>
+                                   <option value="<?php echo $row['id']; ?>" ><?php echo $row['name_club']; ?></option>
+                                      <?php
+                                  }
+                               }
+                                  ?>
+                        </select>
+                        <small style="color: red;"><?php echo $errors['club'] ?? ''; ?></small>
+                    </div>
+                   
                     <div class="form-group">
                         <label for="playerType">Select Player Type:</label>
                         <select id="playerType" name="playerType">
                             <option value="">Select</option>
-                            <option value="player">Field Player</option>
-                            <option value="goalkeeper" >Goalkeeper</option>
+                            <option value="0" >Goalkeeper</option>
+                            <option value="1">Field Player</option>
                         </select>
                         <small style="color: red;"><?php echo $errors['playerType'] ?? ''; ?></small>
                     </div>
@@ -156,7 +262,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
 
                 <!-- Section 3 (Goalkeeper-specific) -->
 
-                <div class="form-section" id="goalkeeperFields">
+                <div class="form-section hidden" id="goalkeeperFields">
                     <div class="form-group">
                         <label for="diving">Diving</label>
                         <input type="number" id="diving" name="diving" placeholder="Enter diving score" value="<?php echo $data['diving'] ?? ''; ?>">
@@ -177,7 +283,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
 
                 <!-- Section 3 (Player-specific) -->
                 
-                <div class="form-section" id="playerFields">
+                <div class="form-section hidden" id="playerFields">
                     <div class="form-group">
                         <label for="playerPosition">Position</label>
                         <select id="playerPosition" name="playerPosition">
@@ -205,11 +311,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
                         <input type="number" id="shooting" name="shooting" placeholder="Enter shooting score" value="">
                         <small style="color: red;"><?php echo $errors['shooting'] ?? ''; ?></small>
                     </div>
-                    <div class="form-group">
-                        <label for="dribbling">Dribbling</label>
-                        <input type="number" id="dribbling" name="dribbling" placeholder="Enter dribbling score" value="">
-                        <small style="color: red;"><?php echo $errors['dribbling'] ?? ''; ?></small>
-                    </div>
+                    
                     <div class="form-group">
                         <label for="defending">Defending</label>
                         <input type="number" id="defending" name="defending" placeholder="Enter defending score" value="">
@@ -231,26 +333,21 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
     </div>
     
     <script>
-    const playerTypeSelect = document.getElementById('playerType');
+    document.getElementById('playerType').addEventListener('change', function() {
     const playerFields = document.getElementById('playerFields');
     const goalkeeperFields = document.getElementById('goalkeeperFields');
 
-    function toggleFields() {
-        const selectedType = playerTypeSelect.value;
-        if (selectedType === 'player') {
-            playerFields.style.display = 'block';
-            goalkeeperFields.style.display = 'none';
-        } else if (selectedType === 'goalkeeper') {
-            playerFields.style.display = 'none';
-            goalkeeperFields.style.display = 'block';
-        } else {
-            playerFields.style.display = 'none';
-            goalkeeperFields.style.display = 'none';
-        }
+    if (this.value === '0') {
+        playerFields.classList.add('hidden');
+        goalkeeperFields.classList.remove('hidden');
+    } else if (this.value === '1') {
+        goalkeeperFields.classList.add('hidden');
+        playerFields.classList.remove('hidden');
+    } else {
+        playerFields.classList.add('hidden');
+        goalkeeperFields.classList.add('hidden');
     }
-
-    playerTypeSelect.addEventListener('change', toggleFields);
-    window.onload = toggleFields; 
+});
 </script>
 
 

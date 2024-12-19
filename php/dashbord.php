@@ -12,9 +12,9 @@
     <div class="sidebar">
         <h1>Players Management</h1>
         <div class="sidebar-menu">
-            <button >Dashboard</button>
-            <button >Players List</button>
-            <button >Add Player</button>
+        <button><a href="dashbord.php">Dashboard</a></button>
+            <button><a href="player.php">Players List</a></button>
+            <button><a href="form.php">Add Player</a></button>
         </div>
     </div>
 
