@@ -70,8 +70,8 @@
               <a href="update.php?id=<?php echo $row['id'];?>"class="bx bxs-pencil text-blue-500 cursor-pointer hover:text-blue-700" >
               </a>
             </td>
-            <td class="bx bx-trash text-red-500 cursor-pointer hover:text-red-700">
-                <i ></i>
+            <td lass="px-4 py-2 border-b border-gray-300 space-x-2">
+               <a href="delet.php?id=<?php echo $row['id'];?>" class="bx bx-trash text-red-500 cursor-pointer hover:text-red-700"></a>
             </td>
         </tr>
         <?php 

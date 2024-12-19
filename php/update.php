@@ -6,8 +6,7 @@ if(isset($_GET['id'])) {
     $id = $_GET['id'];
 }    
     
-    // $query = "SELECT * FROM `player` where  `id` = '$id' ";
-    // $result = mysqli_query($conn, $query);
+  
     $query = "SELECT *  FROM `player` 
     JOIN nationality ON player.id_nationality = nationality.id 
     JOIN club ON  player.id_club = club.id
