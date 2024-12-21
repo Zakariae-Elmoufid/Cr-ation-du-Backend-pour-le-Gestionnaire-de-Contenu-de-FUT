@@ -20,7 +20,6 @@ if(isset($_GET['id'])) {
         die("query failed". mysqli_error($conn));
     } else {
         $row = mysqli_fetch_assoc($result);
-                     
     }
   
     if(isset($_POST['update'])){
@@ -175,7 +174,6 @@ if(isset($_GET['id'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../assets/css/form.css">
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/dashbord.css">
     <title>FUT Champions</title>
@@ -184,153 +182,220 @@ if(isset($_GET['id'])) {
 <?php include ('sidbar.php'); ?>
 
 <main class="ml-64 p-8">
-<div class="w-xl  mx-auto">
-        <div class="form-container">
-            <h2>Player Form</h2>
-            <form id="paginatedForm" action="update.php?id=<?php echo $id;?>" method="POST" >
+        <div class="w-xl  mx-auto">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6">Add New Player</h2>
+            <form id="paginatedForm" action="update.php?id=<?php echo $id;?>" method="POST" class="space-y-6">
                 <!-- Section 1 -->
-                <div class="form-section">
-                    <div class="form-group">
-                        <label for="name">Name</label>
-                        <input type="text" id="name" name="name" placeholder="Enter player's name" value="<?php echo $row['player_name'] ;?>">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                    <label for="name" class="text-sm font-medium text-gray-700 dark:text-gray-200">Player Name</label>                      
+                  <input type="text" id="name"
+                   name="name"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    placeholder="Enter player's name" value="<?php echo $row['player_name'] ;?>">
                     </div>
-                    <div class="form-group">
-                        <label for="photo">Photo</label>
-                        <input type="url" id="photo" name="photo" placeholder="Enter photo URL" value="<?php echo $row['photo'] ;?>">
-                        <small style="color: red;"><?php echo $errors['photo'] ?? ''; ?></small>
-                    </div>
+                    <div class="space-y-2">
+                            <label for="photo" class="text-sm font-medium text-gray-700 dark:text-gray-200">Photo
+                                URL</label>
+                            <input type="url" id="photo" name="photo"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                placeholder="Enter photo URL" value="<?php echo $row['photo'] ;?>">
+                            <small class="text-red-500"><?php echo $errors['photo'] ?? '' ; ?></small>
+                        </div>
 
-                    <div class="form-group">
-                        <label for="rating">Rating</label>
-                        <input type="number" id="rating" name="rating" placeholder="rating" value="<?php echo $row['rating']; ?>">
-                        <small style="color: red;"><?php echo $errors['rating'] ?? ''; ?></small>
-                    </div>
+                        <div class="space-y-2">
+                            <label for="rating"
+                                class="text-sm font-medium text-gray-700 dark:text-gray-200">Rating</label>
+                            <input type="number" id="rating" name="rating"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                placeholder="Enter rating" value="<?php echo $row['rating'] ;?>">
+                            <small class="text-red-500"><?php echo $errors['rating'] ?? ''; ?></small>
+                        </div>
 
-                     <div class="form-group">
-                        <label for="nationality">Nationality</label>
-                        <select id="nationality" name="nationality">
-                            <option value="">nationality?</option>
-                            <?php   $query = "select * from nationality";
+                        <div class="space-y-2">
+                            <label for="nationality"
+                                class="text-sm font-medium text-gray-700 dark:text-gray-200">Nationality</label>
+                            <select id="nationality" name="nationality"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                                <option value="">Select nationality</option>
+                                <?php
+                                $query = "SELECT * FROM `nationality`";
                                 $result = mysqli_query($conn, $query);
+                                while ($rows = mysqli_fetch_assoc($result)) {
+                                      if($rows['id']== $row['id_nationality']){
+                                          echo "<option selected value='{$rows['id']}'>{$rows['name_nationality']}</option>";
+                                      }else{
+                                          echo "<option  value='{$rows['id']}'>{$rows['name_nationality']}</option>";
+                                      }
+                                    
+                                    
+                                }
+                                ?>
+                            </select>
+                            <small class="text-red-500"><?php echo $errors['nationality'] ?? ''; ?></small>
+                        </div>
+                       
 
-                            if(!$result){
-                             die("query failed". mysqli_error($conn));
-                             }else {
-                               while($rows = mysqli_fetch_assoc($result)){
-                                   ?>
-                                <option value="<?php echo $rows['id']; ?>"  ><?php echo $rows['name_nationality']; ?></option>
-                                   <?php
-                               }
-                            }
-                               ?>
-                        </select>
-                        
-                        <small style="color: red;"><?php echo $errors['nationality'] ?? ''; ?></small>
-                    </div>
-                   
+
+                        <div class="space-y-2">
+                            <label for="club" class="text-sm font-medium text-gray-700 dark:text-gray-200">Club</label>
+                            <select id="club" name="club"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                                <option value="">Select club</option>
+                                <?php
+                                $query = "SELECT * FROM `club`";
+                                $result = mysqli_query($conn, $query);
+                                while ($rows = mysqli_fetch_assoc($result)) {
+                                    if($rows['id'] == $row['id_club']){
+                                        echo "<option selected value='{$rows['id']}'>{$rows['name_club']}</option>";
+                                    }else{
+                                        echo "<option value='{$rows['id']}'>{$rows['name_club']}</option>";
+                                    }
+                                     }
+                                     
+                                ?>
+                            </select>
+                            <small class="text-red-500"><?php echo $errors['club'] ?? ''; ?></small>
+                        </div>
+
                     
-                    <div class="form-group">
-                        <label for="club">Club</label>
-                        <select   id="club" name="club">
-                            <option value="">select club</option>
-                            <?php  $query = "select * from club";
-                            $result = mysqli_query($conn, $query);
-                            if(!$result){
-                                die("query failed". mysqli_error($conn));
-                                }else {
-                                  while($rows = mysqli_fetch_assoc($result)){
-                                      ?>
-                                   <option value="<?php echo $rows['id']; ?>" ><?php echo $rows['name_club']; ?></option>
-                                      <?php
-                                  }
-                               }
-                                  ?>
-                        </select>
-                        <small style="color: red;"><?php echo $errors['club'] ?? ''; ?></small>
+                        <div class="space-y-2">
+                            <label for="playerType" class="text-sm font-medium text-gray-700 dark:text-gray-200">Player
+                                Type</label>
+                            <select id="playerType" name="playerType"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                                <?php 
+                                  $query = "SELECT * FROM `player`";
+                                  $result = mysqli_query($conn, $query);
+                                  
+                                    if($row["status_player"] == '0'){
+                                        echo "<option selected value='0' >Goalkeeper</option>";
+                                    }else if ($row["status_player"] == '1'){
+                                        echo "<option selected value='1'>Field Player</option>";
+                                    }
+
+                                    if($row["status_player"] !== '0'){
+                                        echo "<option  value='0' >Goalkeeper</option>";
+                                    }else if ($row["status_player"] !== '1'){
+                                        echo "<option value='1'>Field Player</option>";
+                                    }
+
+                                
+                                ?>
+                              
+                            </select>
+                            <small class="text-red-500"><?php echo $errors['playerType'] ?? ''; ?></small>
+                        </div>
                     </div>
-                    
-                    <div class="form-group">
-                        <label for="playerType">Select Player Type:</label>
-                        <select id="playerType" name="playerType" >
-                            <option>playerType</option>
-                            <option value="0" >Goalkeeper</option>
-                            <option value="1">Field Player</option>
-                        </select>
-                        <small style="color: red;"><?php echo $errors['playerType'] ?? ''; ?></small>
-                    </div>
-                </div>
 
                  <!-- Section 3 (Goalkeeper-specific) -->
 
-                <div class="form-section hidden" id="goalkeeperFields">
-                    <div class="form-group">
-                        <label for="diving">Diving</label>
-                        <input type="number" id="diving" name="diving" placeholder="Enter diving score" value="<?php echo $row['diving'] ; ?>">
-                        <small style="color: red;"><?php echo $errors['diving'] ?? ''; ?></small>
+                 <div id="goalkeeperFields" class="hidden space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="space-y-2">
+                                <label for="diving"
+                                    class="text-sm font-medium text-gray-700 dark:text-gray-200">Diving</label>
+                                <input type="number" id="diving" name="diving"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                    placeholder="Enter diving score"  value="<?php echo $row['diving'] ;?>">
+                                <small class="text-red-500"><?php echo $errors['diving'] ?? ''; ?></small>
+                            </div>
+
+                            <div class="space-y-2">
+                                <label for="handling"
+                                    class="text-sm font-medium text-gray-700 dark:text-gray-200">Handling</label>
+                                <input type="number" id="handling" name="handling"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                    placeholder="Enter handling score"  value="<?php echo $row['handling'] ;?>">
+                                <small class="text-red-500"><?php echo $errors['handling'] ?? ''; ?></small>
+                            </div>
+
+                            <div class="space-y-2">
+                                <label for="reflexes"
+                                    class="text-sm font-medium text-gray-700 dark:text-gray-200">Reflexes</label>
+                                <input type="number" id="reflexes" name="reflexes"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                    placeholder="Enter reflexes score"  value="<?php echo $row['reflexes'] ;?>">
+                                <small class="text-red-500"><?php echo $errors['reflexes'] ?? ''; ?></small>
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="handling">Handling</label>
-                        <input type="number" id="handling" name="handling" placeholder="Enter handling score" value="<?php echo $row['handling']; ?>">
-                        <small style="color: red;"><?php echo $errors['handling'] ?? ''; ?></small>
-                    </div>
-                    <div class="form-group">
-                        <label for="reflexes">Reflexes</label>
-                        <input type="number" id="reflexes" name="reflexes" placeholder="Enter reflexes score" value="<?php echo $row['reflexes']; ?>">
-                        <small style="color: red;"><?php echo $errors['reflexes'] ?? ''; ?></small>
-                    </div>
-                </div>
+
 
 
                 <!-- Section 3 (Player-specific) -->
                 
-                <div class="form-section hidden" id="playerFields">
-                    <div class="form-group">
-                        <label for="playerPosition">Position</label>
-                        <select id="playerPosition" name="playerPosition">
-                            <option value="">Select</option>
-                            <option value="LB" >Left Back (LB)</option>
-                            <option value="CBL" >Center Back Left (CBL)</option>
-                            <option value="CBR" >Center Back Right (CBR)</option>
-                            <option value="RB" >Right Back (RB)</option>
-                            <option value="CDM" >Defensive Midfielder (CDM)</option>
-                            <option value="CM" >Center Midfielder (CM)</option>
-                            <option value="CAM" >Attacking Midfielder (CAM)</option>
-                            <option value="LW" >Left Winger (LW)</option>
-                            <option value="ST" >Center Forward (ST)</option>
-                            <option value="RW" >Right Winger (RW)</option>
-                        </select>
-                        <small style="color: red;"><?php echo $errors['playerPosition'] ?? ''; ?></small>
-                    </div> 
-                    <div class="form-group">
-                        <label for="pace">Pace</label>
-                        <input type="number" id="pace" name="pace" placeholder="Enter pace score" value="<?php echo $row['pace']; ?>">
-                        <small style="color: red;"><?php echo $errors['pace'] ?? ''; ?></small>
+                <div id="playerFields" class=" hidden space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="space-y-2">
+                                <label for="playerPosition"
+                                    class="text-sm font-medium text-gray-700 dark:text-gray-200">Position</label>
+                                <select id="playerPosition" name="playerPosition"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                                    <option value="">Select position</option>
+                                    <option value="LB">Left Back (LB)</option>
+                                    <option value="CBL">Center Back Left (CBL)</option>
+                                    <option value="CBR">Center Back Right (CBR)</option>
+                                    <option value="RB">Right Back (RB)</option>
+                                    <option value="CDM">Defensive Midfielder (CDM)</option>
+                                    <option value="CM">Center Midfielder (CM)</option>
+                                    <option value="CAM">Attacking Midfielder (CAM)</option>
+                                    <option value="LW">Left Winger (LW)</option>
+                                    <option value="ST">Striker (ST)</option>
+                                    <option value="RW">Right Winger (RW)</option>
+                                </select>
+                                <small class="text-red-500"><?php echo $errors['playerPosition'] ?? ''; ?></small>
+                            </div>
+
+                            <div class="space-y-2">
+                                <label for="pace"
+                                    class="text-sm font-medium text-gray-700 dark:text-gray-200">Pace</label>
+                                <input type="number" id="pace" name="pace"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                    placeholder="Enter pace score"  value="<?php echo $row['pace'] ;?>">
+                                <small class="text-red-500"><?php echo $errors['pace'] ?? ''; ?></small>
+                            </div>
+
+                            <div class="space-y-2">
+                                <label for="shooting"
+                                    class="text-sm font-medium text-gray-700 dark:text-gray-200">Shooting</label>
+                                <input type="number" id="shooting" name="shooting"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                    placeholder="Enter shooting score"  value="<?php echo $row['shooting'] ;?>">
+                                <small class="text-red-500"><?php echo $errors['shooting'] ?? ''; ?></small>
+                            </div>
+
+                            <div class="space-y-2">
+                                <label for="defending"
+                                    class="text-sm font-medium text-gray-700 dark:text-gray-200">Defending</label>
+                                <input type="number" id="defending" name="defending"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                    placeholder="Enter defending score"  value="<?php echo $row['defending'] ;?>">
+                                <small class="text-red-500"><?php echo $errors['defending'] ?? ''; ?></small>
+                            </div>
+
+                            <div class="space-y-2">
+                                <label for="physical"
+                                    class="text-sm font-medium text-gray-700 dark:text-gray-200">Physical</label>
+                                <input type="number" id="physical" name="physical"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                    placeholder="Enter physical score"  value="<?php echo $row['physical'] ;?>">
+                                <small class="text-red-500"><?php echo $errors['physical'] ?? ''; ?></small>
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="shooting">Shooting</label>
-                        <input type="number" id="shooting" name="shooting" placeholder="Enter shooting score" value="<?php echo $row['shooting']; ?>">
-                        <small style="color: red;"><?php echo $errors['shooting'] ?? ''; ?></small>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="defending">Defending</label>
-                        <input type="number" id="defending" name="defending" placeholder="Enter defending score" value="<?php echo $row['defending']; ?>">
-                        <small style="color: red;"><?php echo $errors['defending'] ?? ''; ?></small>
-                    </div>
-                    <div class="form-group">
-                        <label for="physical">Physical</label>
-                        <input type="number" id="physical" name="physical" placeholder="Enter physical score" value="<?php echo $row['physical']; ?>">
-                        <small style="color: red;"><?php echo $errors['physical'] ?? ''; ?></small>
-                    </div>
-                </div>
              
 
-                <div class="buttons">
-                    <input class="btn" type="submit" name="update"></input>
-                </div>
+                    <div class="flex justify-end">
+                        <button type="submit"
+                            class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200">
+                            Add Player
+                        </button>
+                    </div>
             </form>
         </div>
- </main>
+</main>
 
 
               
